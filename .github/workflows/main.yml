@@ -17,12 +17,19 @@ jobs:
     - name: Create escript
       run: make release
 
+    - name: Upload ebump
+      uses: actions/upload-artifact@v1
+      with:
+        name: ebump
+        path: _build/default/bin/ebump
+
     - name: Create version.txt
       run: _build/default/bin/ebump version > version.txt
 
-    - uses: actions/upload-artifact@v1
+    - name: Upload ebump version artifact
+      uses: actions/upload-artifact@v1
       with:
-        name: ebump-version
+        name: version
         path: version.txt
 
   release:
@@ -42,9 +49,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
-    - uses: actions/download-artifact@v1
+    - name: Download ebump
+      uses: actions/download-artifact@v1
       with:
-        name: ebump-version
+        name: ebump
+
+    - name: Download version.txt
+      uses: actions/download-artifact@v1
+      with:
+        name: version
 
     - name: Push Tag
       env:
@@ -52,7 +65,7 @@ jobs:
 
       run: |
         go get -u github.com/tcnksm/ghr
-        VERSION=$(cat ebump-version | sed 's/Version: //')
+        VERSION=$(cat version/version.txt | sed 's/Version: //')
         REPO=ebump
         OWNER=xaptum-eng
         $HOME/go/bin/ghr \
@@ -61,4 +74,4 @@ jobs:
             -r ${REPO} \
             -c ${GITHUB_SHA} \
             -delete \
-            ${VERSION} _build/default/bin/ebump
+            ${VERSION} ebump/ebump
