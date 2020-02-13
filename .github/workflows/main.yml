@@ -1,0 +1,64 @@
+name: ebump build
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: erlang:22.2.3
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Create escript
+      run: make release
+
+    - name: Create version.txt
+      run: _build/default/bin/ebump version > version.txt
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: ebump-version
+        path: version.txt
+
+  release:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    if: endsWith(github.ref, 'refs/heads/master')
+
+    steps:
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+      id: go
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - uses: actions/download-artifact@v1
+      with:
+        name: ebump-version
+
+    - name: Push Tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+
+      run: |
+        go get -u github.com/tcnksm/ghr
+        VERSION=$(cat ebump-version | sed 's/Version: //')
+        REPO=ebump
+        OWNER=xaptum-eng
+        $HOME/go/bin/ghr \
+            -t ${GITHUB_TOKEN} \
+            -u ${OWNER} \
+            -r ${REPO} \
+            -c ${GITHUB_SHA} \
+            -delete \
+            ${VERSION} _build/default/bin/ebump
