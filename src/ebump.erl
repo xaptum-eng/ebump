@@ -23,7 +23,7 @@
 -export([main/1]).
 
 -define(APP_NAME, ?MODULE).
--define(VSN, "1.0.1").
+-define(VSN, "1.0.2").
 -define(CONFIG_FILE, "ebump.config").
 
 %% commands
@@ -171,7 +171,12 @@ write_config_file(File, VersionMap) ->
   ok = file:write_file(File, Version).
 
 git_hash() ->
-  os_cmd(?GIT_COMMIT_HASH, [no_halt]).
+  case os_cmd(?GIT_COMMIT_HASH, [no_halt]) of
+    [] ->
+      "0000000";
+    Hash ->
+      Hash
+  end.
 
 git_count() ->
   list_to_integer(os_cmd(?GIT_COMMIT_COUNT)).
