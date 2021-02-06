@@ -23,7 +23,7 @@
 -export([main/1]).
 
 -define(APP_NAME, ?MODULE).
--define(VSN, "1.0.2").
+-define(VSN, "1.0.3").
 -define(CONFIG_FILE, "ebump.config").
 
 %% commands
@@ -161,9 +161,9 @@ sem_ver(#{major := X, minor := Y, patch := Z} = VersionMap) ->
   Count = git_count(),
   case maps:get(pre, VersionMap, nil) of
     nil ->
-      io_lib:format("~p.~p.~p+~p.~s", [X, Y, Z, Count, Hash]);
+      io_lib:format("~p.~p.~p-~p.~s", [X, Y, Z, Count, Hash]);
     Pre ->
-      io_lib:format("~p.~p.~p-~s+~p.~s", [X, Y, Z, Pre, Count, Hash])
+      io_lib:format("~p.~p.~p-~s.~p.~s", [X, Y, Z, Pre, Count, Hash])
     end.
 
 write_config_file(File, VersionMap) ->
