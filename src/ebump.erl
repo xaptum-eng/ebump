@@ -23,7 +23,7 @@
 -export([main/1]).
 
 -define(APP_NAME, ?MODULE).
--define(VSN, "1.0.3").
+-define(VSN, "1.0.4").
 -define(CONFIG_FILE, "ebump.config").
 
 %% commands
@@ -41,8 +41,8 @@
 
 -define(SEMVER_REGEX, "^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$").
 %% git commands
--define(GIT_COMMIT_HASH, "git rev-parse --short HEAD").
--define(GIT_COMMIT_COUNT, "git log --oneline | wc -l | tr -d ' '").
+-define(GIT_COMMIT_HASH, "git rev-parse --short HEAD 2>/dev/null").
+-define(GIT_COMMIT_COUNT, "git log --oneline 2>/dev/null | wc -l | tr -d ' '").
 
 %%====================================================================
 %% API functions
